@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERMORAMA</title>
+    <link rel="stylesheet" href="CSS/main.css" type="text/css">
+    <link rel="shortcut icon" href="ICON/icono.png">
+</head>
+<body>
+
+    <main>
+    <div id="container-main-table">
+        <h1>MEMORAMA</h1>
+        <div id="container"></div><!-- Div donde se craera la tabla con las imagens (lugar de juego) -->
+        <div id="info-player"><!-- Div en cual se almacenaran datos como: num. intentos, puntaje (cartas encontradas) y el tiempo -->
+            <div id="congrats">
+                <h3 id="congratsText"></h3><!--Muestra mensaje cuando el jugador termine de encontart todas las cartas -->
+            </div>
+            <div id="scores">
+                <p id="intent"></p><!-- se almacena el numero de intentos-->
+                <p id="correctCarts"></p><!-- Muestra el numero de cartas encontradas -->
+                <div class="cronometro">
+                    <p id="hms"></p> <!-- Muestra el tiempo -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="btnAccion" onclick="acctionButton()">INICIAR</button>
+    </main>
+
+    <script src="JS/main.js"></script>
+</body>
+</html>
