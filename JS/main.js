@@ -1,94 +1,102 @@
-let playPlace = document.getElementById("container"); // <div> que contiene las cartas
-let infoPlayer = document.getElementById("info-player");// <div> que contiene informacion (tiempo, cartas encontradas, intentos etc)
+let playPlace = document.getElementById("container");
+let infoPlayer = document.getElementById("info-player");
 playPlace.style.display = "none";
 infoPlayer.style.display = "none";
-let congratsText = document.getElementById("congratsText"); // <h3> elemento que muestra mensaje cundo termine el juego 
-let intentsItem = document.getElementById("intent"); // <p> - Elemento que contiene el numero de intentos 
-let correctCartsItem = document.getElementById("correctCarts"); // <p> - Elemento que contiene el numero de cartas encontradas
-var score = 0; // Puntaje (numero de cartas encontradas)
-var intents = 0; // Intentos (numero total de intentos)
+let congratsText = document.getElementById("congratsText");
+let intentsItem = document.getElementById("intent");
+let correctCartsItem = document.getElementById("correctCarts");
+var score = 0;
+var intents = 0;
 
-//Lista de direccion de imagenes (se puede poner el numero de cartas que se necesite) 
-const imagList = ["IMGS/bit.png", "IMGS/html.png", "IMGS/css.png", "IMGS/js.png", "IMGS/git.png", "IMGS/java.png", "IMGS/linux.png", "IMGS/react.png", "IMGS/python.png", "IMGS/vscode.png"];
+// Lista de conceptos con definiciones
+const conceptsList = [
+    { concept: "Vector Gradiente", definition: "Vector que indica la dirección de mayor incremento de una función y cuya magnitud muestra la tasa de cambio." },
+    { concept: "Símbolo de gradiente (∇)", definition: "Operador diferencial que aplica a una función escalar y genera el vector gradiente." },
+    { concept: "Derivada Direccional", definition: "La tasa de cambio de una función en una dirección específica, calculada a partir del vector gradiente." },
+    { concept: "Cálculo del gradiente", definition: "∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z) (para una función f en 3D)" },
+    { concept: "Cálculo de la derivada direccional", definition: "Dᵥf = ∇f • v (donde ∇f es el gradiente y v el vector unitario en la dirección deseada)" },
+    { concept: "Vector Unitario", definition: "Vector con magnitud 1 que indica dirección sin alterar el tamaño." }
+];
 
-/*Function que genera una lista de direccion de imagenes aleatorias 
-ejempo:
-listaDirecciones = ["imagen1.jpg", "imagen2.jpg", "imagen3.jpg"]
-listaDireccionesAleatorias = ["imagen3.jpg", "imagen1.jpg", "imagen2.jpg", "imagen2.jpg", "iamgen3.jpg", "imagen1.jpg"]
-*/
-const randomsImgs = () => {
+// Genera una lista aleatoria de cartas con concepto y definición
+const randomConcepts = () => {
     var listCartsDirection = [];
-    for(let i = 0; i < imagList.length*2; i++) {
-        let src = imagList[Math.floor((Math.random() * ((imagList.length - 1) - 0 + 1)))];
-        let elementCount = null;
+    conceptsList.forEach(concept => {
+        listCartsDirection.push({ type: "concept", text: concept.concept, pair: concept.concept });
+        listCartsDirection.push({ type: "definition", text: concept.definition, pair: concept.concept });
+    });
 
-        for(let j = 0; j < listCartsDirection.length; j++) {
-            (src === listCartsDirection[j]) ? elementCount += 1 : elementCount = elementCount
-        }
-
-        (elementCount < 2) ? listCartsDirection.push(src): i--;
-
-        elementCount = null
-    }
-    return listCartsDirection;
+    // Mezclar las cartas
+    return listCartsDirection.sort(() => Math.random() - 0.5);
 }
 
-function createTable(){ //Crea el tablero donde estaran las cartas (playPlace) y la informacion de partida (infoPlayer) 
+function createTable() {
     playPlace.style.display = 'grid';
     infoPlayer.style.display = 'grid';
     let fragment = document.createDocumentFragment();
-    let listImageRandos = randomsImgs();
+    let randomConceptList = randomConcepts();
     
-    for (let i = 0; i < imagList.length*2; i++) {
+    for (let i = 0; i < randomConceptList.length; i++) {
         let item = document.createElement("DIV");
-        let img = document.createElement("IMG");
+        let cardText = document.createElement("DIV");
     
-        item.setAttribute("class", "div-container-carts div-container-hovered")
-        img.setAttribute("id",`cart-${i+1}`)
-        item.setAttribute("onclick", `intentPlayer("cart-${i+1}", "${listImageRandos[i]}")`);
-        img.src = listImageRandos[i];
-        img.setAttribute("class", "carts");
-        img.style.visibility = "hidden";
+        item.setAttribute("class", "div-container-carts div-container-hovered");
+        cardText.style.textAlign = "center";
+        cardText.style.padding = "1px";
+        cardText.style.padding = "flex";
+        cardText.style.justifyContent = "center";
+        cardText.style.alignContent = "center";
+        cardText.setAttribute("id", `cart-${i+1}`);
+        item.setAttribute("onclick", `intentPlayer("cart-${i+1}", "${randomConceptList[i].pair}", "${randomConceptList[i].type}")`);
+        
+        cardText.innerHTML = `<strong>${randomConceptList[i].text}</strong>`;
+        cardText.style.visibility = "hidden";
     
-        item.appendChild(img);
+        item.appendChild(cardText);
         fragment.appendChild(item);
     }
     
-    playPlace.appendChild(fragment)
+    playPlace.appendChild(fragment);
     intentsItem.innerHTML = `INTENTOS: ${intents}`;
     correctCartsItem.innerHTML = `CARTAS ENCONTRADAS: ${score}`;
 }
 
-// Funcion para que se ejecuta cauando el jugador da click sobre una carta
-var counter = 0; //veces que el jugador a dado click sobre las cartas
-var cartsComparative = [] // Array el cual contendra las direcciones de 2 cartas
-var idArrayCarts = [] // Array que tendra el id de 2 cartas
+var counter = 0;
+var cartsComparative = [];
+var idArrayCarts = [];
 
-function intentPlayer(idCart, getSrc){
-    if(counter < 2){
+function intentPlayer(idCart, pair, type) {
+    if (counter < 2) {
         counter++;
-        viewCart(idCart);  // muestra la carta seleccionada
-        cartsComparative.push(getSrc);
+        viewCart(idCart);
+        cartsComparative.push({ pair, type });
         idArrayCarts.push(idCart);
     }
-    if(counter === 2){ 
-        (cartsComparative[0] !== cartsComparative[1]) ? window.setTimeout(hiddenCarts, 500, idArrayCarts) : correctCarts(idArrayCarts);
-        counter = 0
-        cartsComparative = [], idArrayCarts = []
-        intents++
-        intentsItem.innerHTML = `INTENTOS: ${intents}`
+    if (counter === 2) {
+        if (cartsComparative[0].pair === cartsComparative[1].pair && cartsComparative[0].type !== cartsComparative[1].type) {
+            correctCarts(idArrayCarts);
+        } else {
+            window.setTimeout(hiddenCarts, 500, idArrayCarts);
+        }
+        counter = 0;
+        cartsComparative = [];
+        idArrayCarts = [];
+        intents++;
+        intentsItem.innerHTML = `INTENTOS: ${intents}`;
     }
-    (score === imagList.length) ? showMessageWinner(): console.log("S/N");
+    if (score === conceptsList.length) {
+        showMessageWinner();
+    }
 }
 
-const viewCart = id => document.getElementById(id).style.visibility = "visible"; //Funcion para mostart la carta seleccionada
+const viewCart = id => document.getElementById(id).style.visibility = "visible";
 
-function hiddenCarts(idCarts){ //Funcion para ocultar las 2 cartas cuando estas no sean iguales
+function hiddenCarts(idCarts) {
     document.getElementById(idCarts[0]).style.visibility = "hidden";
     document.getElementById(idCarts[1]).style.visibility = "hidden";
 }
 
-function correctCarts(idArrayCarts){ //Funcion para desacticar el evento onclick cuando las 2 cartas sean iguales
+function correctCarts(idArrayCarts) {
     let cart1 = document.getElementById(idArrayCarts[0]).parentNode;
     let cart2 = document.getElementById(idArrayCarts[1]).parentNode;
     cart1.setAttribute("onclick", "");
@@ -135,7 +143,8 @@ function showMessageWinner(){ //Mensaje cuando el jugador complete el juego
     score = 0, intents = 0;
     stopTime();
 }
-//Cronometro -- Codigo tomado y modificado:  https://francescricart.com/ejercicio-js-crear-un-cronometro-con-javascript/
+
+//Cronometro -- Codigo tomado y modificado: https://francescricart.com/ejercicio-js-crear-un-cronometro-con-javascript/
 function startCronometer(){ // Funcion para iniciadora de cronometro 
     h = 0, m = 0, s = 0;
     document.getElementById("hms").innerHTML="TIEMPO: 00h : 00m : 00s";
@@ -162,4 +171,4 @@ function restart(){ //Funcion para reineiciar el Tiempo
     h = 0; m = 0; s = 0;
 }
 
-const stopTime = () => clearInterval(id); //Funcion para detener el tiempo
+const stopTime = () => clearInterval(id); //Funcion para detener el tiempo.
